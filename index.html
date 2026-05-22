@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="SMM Venue"/>
+<meta name="theme-color" content="#BA7517"/>
+<title>Sri Meenakshi Mahal</title>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/iconfont/tabler-icons.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"/>
+
+<style>
+/* ── Reset & Base ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overscroll-behavior: none; }
+
+:root {
+  --gold:        #BA7517;
+  --gold-dark:   #8C5511;
+  --gold-light:  #EF9F27;
+  --gold-bg:     #FDF3E3;
+  --gold-tint:   #FAEEDA;
+  --cream:       #FDF8F1;
+  --red:         #A32D2D;
+  --red-bg:      #FDF0F0;
+  --green:       #0C6E4E;
+  --green-bg:    #E3F5EE;
+  --blue:        #1A5FAB;
+  --blue-bg:     #EBF3FF;
+  --text:        #1C1208;
+  --text-2:      #6B5A3E;
+  --text-3:      #A3917A;
+  --border:      #E8D9C0;
+  --border-2:    #F0E4CE;
+  --surface:     #FFFFFF;
+  --surface-2:   #FAF5EE;
+  --surface-3:   #F3EAD8;
+  --shadow-sm:   0 1px 4px rgba(80,40,0,0.08);
+  --shadow-md:   0 4px 16px rgba(80,40,0,0.12);
+  --shadow-lg:   0 8px 32px rgba(80,40,0,0.16);
+  --r-sm:        8px;
+  --r-md:        14px;
+  --r-lg:        20px;
+  --r-xl:        28px;
+  --bottom-safe: env(safe-area-inset-bottom, 0px);
+  --top-safe:    env(safe-area-inset-top, 0px);
+  --font-serif:  'DM Serif Display', Georgia, serif;
+  --font-sans:   'DM Sans', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--cream);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout Shell ──────────────────────────────────────── */
+#app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
+
+/* ── Top Bar ───────────────────────────────────────────── */
+.topbar {
+  background: var(--surface);
+  padding: calc(var(--top-safe) + 12px) 16px 0;
+  border-bottom: 1px solid var(--border-2);
+  position: sticky; top: 0; z-index: 100;
+  flex-shrink: 0;
+}
+.topbar-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; }
+.topbar-title { font-family: var(--font-serif); font-size: 18px; color: var(--text); display: flex; align-items: center; gap: 6px; }
+.topbar-title .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); display: inline-block; margin-bottom: 1px; }
+.topbar-sub { font-size: 11px; color: var(--text-3); margin-top: -2px; }
+.sync-btn {
+  background: none; border: 1.5px solid var(--border); border-radius: 50%;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  color: var(--text-2); font-size: 15px; cursor: pointer; transition: all 0.2s;
+}
+.sync-btn.syncing { border-color: var(--gold); color: var(--gold); animation: spin 1s linear infinite; }
+.sync-btn.ok     { border-color: var(--green); color: var(--green); }
+.sync-btn.err    { border-color: var(--red); color: var(--red); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Tab Bar ───────────────────────────────────────────── */
+.tabbar { display: flex; gap: 0; border-top: 1px solid var(--border-2); }
+.tab-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 6px 0 calc(6px + var(--bottom-safe));
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-sans); font-size: 10px; color: var(--text-3);
+  gap: 2px; transition: color 0.15s; position: relative;
+}
+.tab-btn i { font-size: 20px; }
+.tab-btn.active { color: var(--gold); }
+.tab-btn.active::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 32px; height: 2.5px; background: var(--gold); border-radius: 0 0 3px 3px;
+}
+.tab-btn:not(.active) { color: var(--text-3); }
+
+/* nav tabs inside topbar (not bottom) */
+.nav-tabs { display: flex; margin: 0 -16px; overflow-x: auto; scrollbar-width: none; }
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab {
+  flex-shrink: 0; background: none; border: none; padding: 8px 16px;
+  font-family: var(--font-sans); font-size: 13px; color: var(--text-3);
+  border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap;
+  transition: all 0.15s;
+}
+.nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); font-weight: 500; }
+
+/* ── Scroll Area ───────────────────────────────────────── */
+.scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+.pad { padding: 16px; }
+
+/* ── Cards ─────────────────────────────────────────────── */
+.card {
+  background: var(--surface); border: 1px solid var(--border-2);
+  border-radius: var(--r-lg); overflow: hidden;
+  box-shadow: var(--shadow-sm); margin-bottom: 12px;
+}
+.card-header {
+  padding: 14px 16px; display: flex; align-items: center;
+  justify-content: space-between; border-bottom: 1px solid var(--border-2);
+}
+.card-title { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+.card-title i { color: var(--gold); }
+
+/* ── Stat Grid ─────────────────────────────────────────── */
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border-2);
+  border-radius: var(--r-md); padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-label { font-size: 10px; font-weight: 500; color: var(--text-3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+.stat-value { font-size: 20px; font-weight: 600; color: var(--text); line-height: 1.1; }
+.stat-sub   { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+.stat-accent { height: 3px; border-radius: 0 0 var(--r-md) var(--r-md); margin: 12px -14px -12px; }
+
+/* ── Booking List Item ─────────────────────────────────── */
+.booking-item {
+  display: flex; align-items: center; padding: 13px 16px;
+  border-bottom: 1px solid var(--border-2); cursor: pointer;
+  gap: 12px; transition: background 0.1s;
+}
+.booking-item:last-child { border-bottom: none; }
+.booking-item:active { background: var(--surface-2); }
+
+.bk-date-box {
+  width: 44px; height: 44px; border-radius: var(--r-sm);
+  background: var(--gold-tint); border: 1px solid #E9C880;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; flex-shrink: 0; line-height: 1.1;
+}
+.bk-date-day  { font-size: 18px; font-weight: 600; color: var(--gold-dark); }
+.bk-date-mon  { font-size: 9px; color: var(--gold); font-weight: 500; letter-spacing: 0.3px; }
+.bk-info      { flex: 1; min-width: 0; }
+.bk-name      { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bk-meta      { font-size: 11px; color: var(--text-3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bk-right     { text-align: right; flex-shrink: 0; }
+.bk-amount    { font-size: 13px; font-weight: 600; color: var(--text); }
+.bk-balance   { font-size: 11px; margin-top: 2px; }
+
+/* ── Badges ────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; font-size: 10px; font-weight: 500;
+  padding: 2px 8px; border-radius: 99px; white-space: nowrap; border: 1px solid transparent;
+}
+.badge-confirmed { background: var(--green-bg); color: var(--green); border-color: #A0D9C5; }
+.badge-tentative { background: var(--gold-tint); color: var(--gold-dark); border-color: #E9C880; }
+.badge-cancelled { background: var(--red-bg); color: var(--red); border-color: #F0A0A0; }
+.badge-paid      { background: var(--green-bg); color: var(--green); border-color: #A0D9C5; }
+.badge-partial   { background: var(--gold-tint); color: var(--gold-dark); border-color: #E9C880; }
+.badge-unpaid    { background: var(--red-bg); color: var(--red); border-color: #F0A0A0; }
+.badge-offline   { background: #EEE; color: #666; border-color: #DDD; }
+
+/* ── Forms ─────────────────────────────────────────────── */
+.form-section { margin-bottom: 20px; }
+.form-section-title {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--text-3); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.form-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border-2); }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 11px; font-weight: 500; color: var(--text-2); margin-bottom: 5px; }
+.field input, .field select, .field textarea {
+  width: 100%; height: 44px; padding: 0 12px;
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  background: var(--surface); color: var(--text);
+  font-family: var(--font-sans); font-size: 14px;
+  outline: none; -webkit-appearance: none; appearance: none;
+  transition: border-color 0.15s;
+}
+.field textarea { height: auto; padding: 10px 12px; resize: none; line-height: 1.5; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
+.field .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg-btn {
+  padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px;
+  border: 1.5px solid var(--border); background: var(--surface-2); color: var(--text-2);
+  font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; flex: 1;
+}
+.seg-btn.active { background: var(--gold-tint); color: var(--gold-dark); border-color: var(--gold); font-weight: 500; }
+
+.read-field {
+  background: var(--surface-2); border: 1.5px solid var(--border-2);
+  border-radius: var(--r-sm); height: 44px; padding: 0 12px;
+  display: flex; align-items: center; font-size: 14px; font-weight: 500;
+  color: var(--text-2);
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  height: 48px; border-radius: var(--r-md); font-family: var(--font-sans);
+  font-size: 14px; font-weight: 500; border: none; cursor: pointer;
+  transition: all 0.15s; width: 100%;
+}
+.btn-primary   { background: var(--gold); color: #fff; }
+.btn-primary:active { background: var(--gold-dark); }
+.btn-secondary { background: var(--surface-2); color: var(--text-2); border: 1.5px solid var(--border); }
+.btn-danger    { background: var(--red-bg); color: var(--red); border: 1.5px solid #F0A0A0; }
+.btn-sm {
+  height: 34px; padding: 0 14px; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 500; border: none; cursor: pointer;
+  font-family: var(--font-sans); display: inline-flex; align-items: center; gap: 4px;
+}
+.fab {
+  position: fixed; bottom: calc(70px + var(--bottom-safe) + 16px); right: 16px;
+  width: 52px; height: 52px; border-radius: 50%; background: var(--gold);
+  color: #fff; border: none; cursor: pointer; box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+  transition: transform 0.15s;
+  z-index: 50;
+}
+.fab:active { transform: scale(0.93); }
+
+/* ── Bottom Nav ────────────────────────────────────────── */
+.bottom-nav {
+  display: flex; background: var(--surface); border-top: 1px solid var(--border-2);
+  padding-bottom: var(--bottom-safe); flex-shrink: 0;
+  position: sticky; bottom: 0; z-index: 100;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 8px 4px; background: none; border: none; cursor: pointer;
+  font-family: var(--font-sans); font-size: 10px; color: var(--text-3);
+  gap: 3px; transition: color 0.15s; position: relative;
+}
+.nav-item i { font-size: 22px; line-height: 1; }
+.nav-item.active { color: var(--gold); }
+.nav-item.active::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 28px; height: 3px; background: var(--gold); border-radius: 0 0 4px 4px;
+}
+
+/* ── Detail Page ───────────────────────────────────────── */
+.page { display: none; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; }
+.page.open { display: flex; }
+.page-header {
+  background: var(--surface); border-bottom: 1px solid var(--border-2);
+  padding: calc(var(--top-safe) + 10px) 16px 10px;
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.page-back { background: none; border: none; font-size: 22px; color: var(--text-2); cursor: pointer; padding: 4px; display: flex; }
+.page-title { font-size: 16px; font-weight: 600; flex: 1; }
+.page-actions { display: flex; gap: 6px; }
+
+/* ── Hero block (detail) ───────────────────────────────── */
+.detail-hero {
+  background: linear-gradient(135deg, var(--gold-tint) 0%, #FDF0D0 100%);
+  border-bottom: 1px solid #E9C880;
+  padding: 18px 16px 14px;
+}
+.detail-hero-name { font-family: var(--font-serif); font-size: 22px; color: var(--text); margin-bottom: 3px; }
+.detail-hero-sub  { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+
+/* ── Info rows ─────────────────────────────────────────── */
+.info-row { display: flex; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border-2); gap: 10px; }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 11px; color: var(--text-3); width: 100px; flex-shrink: 0; padding-top: 1px; }
+.info-val   { font-size: 14px; color: var(--text); flex: 1; }
+
+/* ── Payment pill ──────────────────────────────────────── */
+.pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.pay-cell { text-align: center; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--r-sm); padding: 10px 6px; }
+.pay-cell-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-3); margin-bottom: 4px; }
+.pay-cell-val   { font-size: 16px; font-weight: 600; }
+
+/* ── Calendar ──────────────────────────────────────────── */
+.cal-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+.cal-month-label { font-family: var(--font-serif); font-size: 18px; color: var(--text); }
+.cal-nav { background: none; border: 1.5px solid var(--border); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-2); cursor: pointer; }
+.cal-grid-head { display: grid; grid-template-columns: repeat(7,1fr); margin: 0 16px; }
+.cal-grid-head span { text-align: center; font-size: 10px; font-weight: 500; color: var(--text-3); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); margin: 4px 16px 0; }
+.cal-cell {
+  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding-top: 4px; cursor: pointer; border-radius: var(--r-sm);
+  position: relative; font-size: 12px; transition: background 0.1s;
+}
+.cal-cell.empty { cursor: default; }
+.cal-cell.today .cal-cell-day { background: var(--gold); color: #fff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.cal-cell.selected { background: var(--gold-tint); }
+.cal-cell:not(.empty):active { background: var(--surface-3); }
+.cal-cell-day { font-size: 12px; color: var(--text); }
+.cal-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); margin-top: 2px; }
+.cal-dot.red { background: var(--red); }
+.cal-day-list { margin: 12px 16px 0; }
+.cal-day-title { font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; }
+
+/* ── Search ────────────────────────────────────────────── */
+.search-wrap { position: relative; margin: 0 0 12px; }
+.search-wrap input { padding-left: 36px; }
+.search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--text-3); pointer-events: none; }
+
+/* ── Filter chips ──────────────────────────────────────── */
+.chips { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0; padding: 5px 12px; border-radius: 99px; font-size: 11px;
+  font-weight: 500; border: 1.5px solid var(--border); background: var(--surface);
+  color: var(--text-3); cursor: pointer; font-family: var(--font-sans);
+  transition: all 0.12s;
+}
+.chip.active { background: var(--gold-tint); color: var(--gold-dark); border-color: var(--gold); }
+
+/* ── Empty state ───────────────────────────────────────── */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text-3); }
+.empty-state i { font-size: 48px; color: var(--border); margin-bottom: 12px; display: block; }
+.empty-state p { font-size: 13px; }
+
+/* ── Toast ─────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: calc(72px + var(--bottom-safe) + 8px); left: 50%;
+  transform: translateX(-50%) translateY(80px); opacity: 0;
+  background: var(--text); color: #fff; padding: 10px 18px;
+  border-radius: 99px; font-size: 13px; z-index: 999;
+  white-space: nowrap; pointer-events: none; max-width: 90vw;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.green { background: var(--green); }
+.toast.red   { background: var(--red); }
+
+/* ── Overlay confirm ───────────────────────────────────── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: none; align-items: flex-end; }
+.overlay.show { display: flex; }
+.overlay-sheet {
+  background: var(--surface); border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: 20px 20px calc(20px + var(--bottom-safe)); width: 100%;
+  max-width: 480px; margin: 0 auto;
+}
+.overlay-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.overlay-body  { font-size: 13px; color: var(--text-2); margin-bottom: 18px; }
+.overlay-btns  { display: flex; gap: 8px; }
+
+/* ── Config sheet ──────────────────────────────────────── */
+.config-card { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 12px; }
+.config-row  { padding: 14px 16px; border-bottom: 1px solid var(--border-2); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.config-row:last-child { border-bottom: none; }
+.config-label { font-size: 14px; color: var(--text); }
+.config-sub   { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.config-badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; background: var(--green-bg); color: var(--green); border: 1px solid #A0D9C5; }
+.config-badge.warn { background: var(--gold-tint); color: var(--gold-dark); border-color: var(--gold); }
+
+/* ── Responsive desktop centering ─────────────────────── */
+@media (min-width: 480px) {
+  body { background: #E8D9C0; }
+  #app { box-shadow: var(--shadow-lg); }
+  .page { box-shadow: var(--shadow-lg); position: fixed; left: 50%; top: 0; transform: translateX(-50%); width: 100%; }
+  .fab  { right: calc(50% - 240px + 16px); }
+  .toast { max-width: 440px; }
+  .overlay { align-items: center; }
+  .overlay-sheet { border-radius: var(--r-xl); max-width: 380px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ MAIN APP ═══════════════ -->
+<div id="app">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-row">
+      <div>
+        <div class="topbar-title">
+          <span class="dot"></span>Sri Meenakshi Mahal
+        </div>
+        <div class="topbar-sub">Booking &amp; Payments Manager</div>
+      </div>
+      <button class="sync-btn" id="syncBtn" onclick="manualSync()" title="Sync with Google Sheets">
+        <i class="ti ti-refresh"></i>
+      </button>
+    </div>
+    <div class="nav-tabs" id="mainTabs">
+      <button class="nav-tab active" onclick="switchTab('dashboard',this)">Dashboard</button>
+      <button class="nav-tab" onclick="switchTab('bookings',this)">Bookings</button>
+      <button class="nav-tab" onclick="switchTab('calendar',this)">Calendar</button>
+      <button class="nav-tab" onclick="switchTab('settings',this)">Settings</button>
+    </div>
+  </div>
+
+  <!-- Scroll content -->
+  <div class="scroll" id="mainScroll">
+
+    <!-- ─── DASHBOARD ──────────────────────────── -->
+    <div id="tab-dashboard" class="pad">
+      <div class="stats" id="dashStats"></div>
+      <div class="card" id="upcomingCard">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-clock"></i>Upcoming events</div>
+          <button class="btn-sm" style="background:none;border:none;color:var(--gold);font-family:var(--font-sans);cursor:pointer;font-size:12px;" onclick="switchTab('bookings',document.querySelectorAll('.nav-tab')[1])">All →</button>
+        </div>
+        <div id="upcomingList"></div>
+      </div>
+    </div>
+
+    <!-- ─── BOOKINGS ───────────────────────────── -->
+    <div id="tab-bookings" class="pad" style="display:none">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="search" id="searchInput" placeholder="Search name, phone, hall…" oninput="renderList()"/>
+      </div>
+      <div class="chips" id="filterChips">
+        <button class="chip active" onclick="setFilter('All',this)">All</button>
+        <button class="chip" onclick="setFilter('Confirmed',this)">Confirmed</button>
+        <button class="chip" onclick="setFilter('Tentative',this)">Tentative</button>
+        <button class="chip" onclick="setFilter('Cancelled',this)">Cancelled</button>
+        <button class="chip" onclick="setFilter('Unpaid',this)">Balance due</button>
+      </div>
+      <div class="card" id="bookingList"></div>
+    </div>
+
+    <!-- ─── CALENDAR ───────────────────────────── -->
+    <div id="tab-calendar" style="display:none;padding-bottom:80px;">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="calNav(-1)"><i class="ti ti-chevron-left"></i></button>
+        <div class="cal-month-label" id="calLabel"></div>
+        <button class="cal-nav" onclick="calNav(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+      <div class="cal-grid-head" id="calHead"></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-day-list" id="calDayList"></div>
+    </div>
+
+    <!-- ─── SETTINGS ───────────────────────────── -->
+    <div id="tab-settings" class="pad" style="display:none;padding-bottom:80px;">
+      <div style="margin-bottom:16px;">
+        <div style="font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:4px;">Settings</div>
+        <div style="font-size:12px;color:var(--text-3);">Configure Google Sheets sync</div>
+      </div>
+      <div class="config-card">
+        <div class="config-row">
+          <div>
+            <div class="config-label">Google Apps Script URL</div>
+            <div class="config-sub">Paste your deployed Web App URL here</div>
+          </div>
+        </div>
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border-2);">
+          <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/…/exec"
+            style="width:100%;height:40px;padding:0 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:var(--font-sans);outline:none;background:var(--surface);color:var(--text);"
+            oninput="settingsDirty=true"/>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button class="btn btn-secondary" style="height:38px;font-size:13px;" onclick="testConnection()">
+              <i class="ti ti-plug"></i>Test connection
+            </button>
+            <button class="btn btn-primary" style="height:38px;font-size:13px;" onclick="saveSettings()">
+              <i class="ti ti-device-floppy"></i>Save
+            </button>
+          </div>
+        </div>
+        <div class="config-row">
+          <div>
+            <div class="config-label">Sync status</div>
+            <div class="config-sub" id="syncStatusLabel">Not configured</div>
+          </div>
+          <span class="config-badge warn" id="syncStatusBadge">Setup needed</span>
+        </div>
+        <div class="config-row">
+          <div>
+            <div class="config-label">Offline queue</div>
+            <div class="config-sub" id="queueLabel">0 pending operations</div>
+          </div>
+          <button class="btn-sm" style="background:var(--gold);color:#fff;border-radius:var(--r-sm);border:none;padding:0 12px;height:30px;" onclick="manualSync()">Sync now</button>
+        </div>
+      </div>
+
+      <div class="config-card">
+        <div class="config-row">
+          <div>
+            <div class="config-label">Total bookings</div>
+            <div class="config-sub" id="totalBkLabel">0 in local storage</div>
+          </div>
+        </div>
+        <div class="config-row" style="cursor:pointer;" onclick="exportCSV()">
+          <div>
+            <div class="config-label">Export as CSV</div>
+            <div class="config-sub">Download all bookings</div>
+          </div>
+          <i class="ti ti-download" style="color:var(--text-3);font-size:18px;"></i>
+        </div>
+        <div class="config-row" style="cursor:pointer;color:var(--red);" onclick="clearLocalData()">
+          <div>
+            <div class="config-label" style="color:var(--red);">Clear local data</div>
+            <div class="config-sub">Re-fetch from Google Sheets</div>
+          </div>
+          <i class="ti ti-trash" style="color:var(--red);font-size:18px;"></i>
+        </div>
+      </div>
+
+      <div style="background:var(--gold-tint);border:1px solid #E9C880;border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:600;color:var(--gold-dark);margin-bottom:6px;">📋 How to set up Google Sheets sync</div>
+        <ol style="font-size:12px;color:var(--text-2);line-height:1.8;padding-left:16px;">
+          <li>Open <strong>script.google.com</strong> and create a new project</li>
+          <li>Paste the contents of <strong>Code.gs</strong> into the editor</li>
+          <li>Click <strong>Deploy → New deployment → Web App</strong></li>
+          <li>Set "Execute as: <strong>Me</strong>" and "Access: <strong>Anyone</strong>"</li>
+          <li>Copy the Web App URL and paste it above</li>
+          <li>Tap <strong>Test connection</strong> to verify</li>
+        </ol>
+      </div>
+
+      <div style="text-align:center;padding:12px;font-size:11px;color:var(--text-3);">
+        Sri Meenakshi Mahal · Booking Manager v1.0<br/>
+        <span id="onlineIndicator">●</span> <span id="onlineLabel">Online</span>
+      </div>
+    </div>
+
+  </div><!-- /scroll -->
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard',document.querySelectorAll('.nav-tab')[0]);setNav('dashboard')">
+      <i class="ti ti-layout-dashboard"></i><span>Dashboard</span>
+    </button>
+    <button class="nav-item" id="nav-bookings" onclick="switchTab('bookings',document.querySelectorAll('.nav-tab')[1]);setNav('bookings')">
+      <i class="ti ti-list"></i><span>Bookings</span>
+    </button>
+    <button class="nav-item" id="nav-calendar" onclick="switchTab('calendar',document.querySelectorAll('.nav-tab')[2]);setNav('calendar')">
+      <i class="ti ti-calendar"></i><span>Calendar</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="switchTab('settings',document.querySelectorAll('.nav-tab')[3]);setNav('settings')">
+      <i class="ti ti-settings"></i><span>Settings</span>
+    </button>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openForm(null)" title="New booking">
+    <i class="ti ti-plus"></i>
+  </button>
+
+</div><!-- /app -->
+
+<!-- ═══════════════ DETAIL PAGE ═══════════════ -->
+<div class="page" id="detailPage">
+  <div class="page-header">
+    <button class="page-back" onclick="closePage('detailPage')"><i class="ti ti-arrow-left"></i></button>
+    <div class="page-title">Booking details</div>
+    <div class="page-actions">
+      <button class="btn-sm" style="background:none;border:1.5px solid var(--border);color:var(--text-2);" onclick="editCurrentDetail()"><i class="ti ti-edit"></i> Edit</button>
+      <button class="btn-sm" style="background:none;border:1.5px solid #F0A0A0;color:var(--red);" onclick="deleteConfirm()"><i class="ti ti-trash"></i></button>
+    </div>
+  </div>
+  <div class="scroll" id="detailContent"></div>
+</div>
+
+<!-- ═══════════════ FORM PAGE ══════════════════ -->
+<div class="page" id="formPage">
+  <div class="page-header">
+    <button class="page-back" onclick="closePage('formPage')"><i class="ti ti-arrow-left"></i></button>
+    <div class="page-title" id="formTitle">New booking</div>
+  </div>
+  <div class="scroll" style="padding-bottom:16px;">
+    <div class="pad">
+
+      <div class="form-section">
+        <div class="form-section-title">Client details</div>
+        <div class="field"><label>Client / Family name *</label><input type="text" id="f-clientName" placeholder="e.g. Ravi &amp; Priya Sharma"/></div>
+        <div class="field row2">
+          <div><label>Phone *</label><input type="tel" id="f-phone" placeholder="+91 98765 43210"/></div>
+          <div><label>Email</label><input type="email" id="f-email" placeholder="optional"/></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Event details</div>
+        <div class="field row2">
+          <div><label>Event date *</label><input type="date" id="f-eventDate"/></div>
+          <div>
+            <label>Event type</label>
+            <select id="f-eventType">
+              <option>Wedding</option><option>Reception</option><option>Engagement</option>
+              <option>Naming Ceremony</option><option>Birthday</option>
+              <option>Corporate Event</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Hall / area</label>
+          <select id="f-hall">
+            <option>Main Banquet Hall</option><option>Garden Pavilion</option>
+            <option>Royal Suite</option><option>Open Terrace</option><option>VIP Lounge</option>
+          </select>
+        </div>
+        <div class="field row2">
+          <div><label>Guest count</label><input type="number" id="f-guestCount" min="1" placeholder="e.g. 500"/></div>
+          <div><label>Guest rooms</label><input type="number" id="f-guestRooms" min="0" placeholder="0"/></div>
+        </div>
+        <div class="field">
+          <label>AC</label>
+          <div class="seg">
+            <button type="button" class="seg-btn active" id="ac-yes" onclick="setAC(true)">Yes — with AC</button>
+            <button type="button" class="seg-btn" id="ac-no" onclick="setAC(false)">No AC</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <div class="seg">
+            <button type="button" class="seg-btn active" data-status="Confirmed" onclick="setStatus('Confirmed',this)">Confirmed</button>
+            <button type="button" class="seg-btn" data-status="Tentative" onclick="setStatus('Tentative',this)">Tentative</button>
+            <button type="button" class="seg-btn" data-status="Cancelled" onclick="setStatus('Cancelled',this)">Cancelled</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Payment</div>
+        <div class="field row2">
+          <div><label>Total amount (₹)</label><input type="number" id="f-totalAmount" min="0" placeholder="0" oninput="calcBalance()"/></div>
+          <div><label>Advance received (₹)</label><input type="number" id="f-advancePaid" min="0" placeholder="0" oninput="calcBalance()"/></div>
+        </div>
+        <div class="field">
+          <label>Balance due (auto-calculated)</label>
+          <div class="read-field" id="f-balance">₹ 0</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Notes</div>
+        <div class="field"><textarea id="f-notes" rows="3" placeholder="Catering, decoration, special requests…"></textarea></div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closePage('formPage')">Cancel</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="submitForm()"><i class="ti ti-check"></i>Save booking</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════ OVERLAY ═══════════════ -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="overlay-sheet">
+    <div class="overlay-title" id="overlayTitle"></div>
+    <div class="overlay-body" id="overlayBody"></div>
+    <div class="overlay-btns" id="overlayBtns"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ JS ═══════════════ -->
+<script>
+"use strict";
+// ── Config ──────────────────────────────────────────────
+const LS_KEY   = "smm_bookings_v2";
+const LS_Q     = "smm_offline_queue";
+const LS_CFG   = "smm_config";
+const MONTHS_F = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MONTHS_S = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAYS     = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+// ── State ────────────────────────────────────────────────
+let bookings = [];
+let offlineQ  = [];
+let cfg       = { scriptUrl: "" };
+let formAC    = true;
+let formStatus = "Confirmed";
+let editId    = null;
+let detailId  = null;
+let currentFilter = "All";
+let calYear   = new Date().getFullYear();
+let calMonth  = new Date().getMonth();
+let calDay    = null;
+let settingsDirty = false;
+let isOnline  = navigator.onLine;
+
+// ── Init ─────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", async () => {
+  loadLocal();
+  renderAll();
+  renderCalendar();
+
+  document.getElementById("scriptUrlInput").value = cfg.scriptUrl || "";
+
+  if (cfg.scriptUrl) await syncFromSheets();
+
+  updateOnlineUI();
+  updateQueueLabel();
+});
+
+window.addEventListener("online",  () => { isOnline = true;  updateOnlineUI(); manualSync(); });
+window.addEventListener("offline", () => { isOnline = false; updateOnlineUI(); });
+
+// SW registration
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").then(reg => {
+    reg.addEventListener("updatefound", () => {
+      const w = reg.installing;
+      w.addEventListener("statechange", () => { if(w.state==="installed") w.postMessage("SKIP_WAITING"); });
+    });
+  });
+  navigator.serviceWorker.addEventListener("message", e => {
+    if (e.data?.type === "FLUSH_QUEUE") flushQueue();
+  });
+}
+
+// ── Local storage ────────────────────────────────────────
+function loadLocal() {
+  try { bookings = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { bookings = []; }
+  try { offlineQ = JSON.parse(localStorage.getItem(LS_Q))   || []; } catch { offlineQ = []; }
+  try { cfg      = JSON.parse(localStorage.getItem(LS_CFG)) || {}; } catch { cfg = {}; }
+}
+function saveBk()  { localStorage.setItem(LS_KEY, JSON.stringify(bookings)); }
+function saveQ()   { localStorage.setItem(LS_Q,   JSON.stringify(offlineQ)); }
+function saveCfg() { localStorage.setItem(LS_CFG, JSON.stringify(cfg)); }
+
+// ── API calls ────────────────────────────────────────────
+async function api(body) {
+  if (!cfg.scriptUrl) throw new Error("No script URL configured");
+  const r = await fetch(cfg.scriptUrl, {
+    method: "POST",
+    headers: { "Content-Type":"text/plain" },
+    body: JSON.stringify(body)
+  });
+  const data = await r.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+
+async function syncFromSheets() {
+  if (!cfg.scriptUrl) return;
+  setSyncState("syncing");
+  try {
+    const r = await fetch(cfg.scriptUrl);
+    const data = await r.json();
+    if (Array.isArray(data)) {
+      bookings = data;
+      saveBk();
+      renderAll();
+      renderCalendar();
+      setSyncState("ok");
+      updateSyncBadge(true);
+    } else throw new Error(data.error || "Bad response");
+  } catch(e) {
+    setSyncState("err");
+    showToast("Sync failed: " + e.message, "red");
+  }
+}
+
+async function flushQueue() {
+  if (!offlineQ.length || !cfg.scriptUrl || !isOnline) return;
+  try {
+    await api({ action: "batch", ops: offlineQ });
+    offlineQ = [];
+    saveQ();
+    updateQueueLabel();
+    showToast("Synced " + offlineQ.length + " pending operations", "green");
+    await syncFromSheets();
+  } catch(e) { /* keep queue */ }
+}
+
+async function manualSync() {
+  await flushQueue();
+  await syncFromSheets();
+}
+
+// ── CRUD ─────────────────────────────────────────────────
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+
+async function createBooking(obj) {
+  obj.id = newId();
+  obj.createdAt = new Date().toISOString();
+  bookings.push(obj);
+  saveBk();
+  if (isOnline && cfg.scriptUrl) {
+    try { await api({ action:"create", data: obj }); setSyncState("ok"); }
+    catch { queue({ action:"create", data: obj }); }
+  } else { queue({ action:"create", data: obj }); }
+}
+
+async function updateBooking(obj) {
+  const idx = bookings.findIndex(b => b.id === obj.id);
+  if (idx < 0) return;
+  bookings[idx] = obj;
+  saveBk();
+  if (isOnline && cfg.scriptUrl) {
+    try { await api({ action:"update", data: obj }); setSyncState("ok"); }
+    catch { queue({ action:"update", data: obj }); }
+  } else { queue({ action:"update", data: obj }); }
+}
+
+async function deleteBooking(id) {
+  bookings = bookings.filter(b => b.id !== id);
+  saveBk();
+  if (isOnline && cfg.scriptUrl) {
+    try { await api({ action:"delete", id }); setSyncState("ok"); }
+    catch { queue({ action:"delete", id }); }
+  } else { queue({ action:"delete", id }); }
+}
+
+function queue(op) {
+  // Remove duplicate ops for same id
+  offlineQ = offlineQ.filter(o => o.id !== op.id && !(o.data && o.data.id === (op.data?.id)));
+  offlineQ.push(op);
+  saveQ();
+  updateQueueLabel();
+  setSyncState("err");
+}
+
+// ── Render helpers ───────────────────────────────────────
+const fmt = n => "₹" + Number(n||0).toLocaleString("en-IN");
+const fmtDate = s => { if(!s) return "—"; const d = new Date(s+"T00:00:00"); return d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}); };
+const today = () => new Date().toISOString().slice(0,10);
+const bal   = b => Math.max(0, Number(b.totalAmount||0) - Number(b.advancePaid||0));
+
+function statusBadge(s) {
+  const m = {Confirmed:"badge-confirmed",Tentative:"badge-tentative",Cancelled:"badge-cancelled"};
+  return `<span class="badge ${m[s]||""}">${s}</span>`;
+}
+function payBadge(b) {
+  const t=Number(b.totalAmount||0),a=Number(b.advancePaid||0);
+  if(!t) return `<span class="badge badge-unpaid">Not set</span>`;
+  if(a>=t) return `<span class="badge badge-paid">Fully paid</span>`;
+  if(a>0)  return `<span class="badge badge-partial">Partial</span>`;
+  return     `<span class="badge badge-unpaid">Unpaid</span>`;
+}
+
+// ── renderAll ─────────────────────────────────────────────
+function renderAll() {
+  renderDashboard();
+  renderList();
+  document.getElementById("totalBkLabel").textContent = bookings.length + " bookings in local storage";
+}
+
+// ── Dashboard ─────────────────────────────────────────────
+function renderDashboard() {
+  const td = today();
+  const active = bookings.filter(b => b.status !== "Cancelled");
+  const rev  = active.reduce((s,b) => s+Number(b.totalAmount||0), 0);
+  const rec  = active.reduce((s,b) => s+Number(b.advancePaid||0), 0);
+  const pend = rev - rec;
+  const up   = active.filter(b => b.eventDate >= td).length;
+
+  document.getElementById("dashStats").innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total bookings</div><div class="stat-value">${bookings.length}</div><div class="stat-accent" style="background:#BA7517;"></div></div>
+    <div class="stat-card"><div class="stat-label">Upcoming</div><div class="stat-value">${up}</div><div class="stat-accent" style="background:#1A5FAB;"></div></div>
+    <div class="stat-card"><div class="stat-label">Total revenue</div><div class="stat-value" style="font-size:15px;">${fmt(rev)}</div><div class="stat-accent" style="background:#D85A30;"></div></div>
+    <div class="stat-card"><div class="stat-label">Balance pending</div><div class="stat-value" style="font-size:15px;color:${pend>0?"var(--red)":"var(--green)"};">${fmt(pend)}</div><div class="stat-sub">${rev>0?Math.round(pend/rev*100)+"% of revenue":""}</div><div class="stat-accent" style="background:${pend>0?"#A32D2D":"#0C6E4E"};"></div></div>
+  `;
+
+  const upcoming = bookings.filter(b => b.eventDate >= td && b.status !== "Cancelled").sort((a,b) => a.eventDate<b.eventDate?-1:1).slice(0,8);
+  document.getElementById("upcomingList").innerHTML = upcoming.length
+    ? upcoming.map(b => bookingItemHTML(b)).join("")
+    : `<div class="empty-state"><i class="ti ti-calendar-off"></i><p>No upcoming events</p></div>`;
+}
+
+// ── Booking list ──────────────────────────────────────────
+function renderList() {
+  const q = (document.getElementById("searchInput").value||"").toLowerCase();
+  let list = bookings.slice().sort((a,b) => a.eventDate < b.eventDate ? -1 : 1);
+
+  if (currentFilter === "Unpaid") list = list.filter(b => bal(b) > 0 && b.status !== "Cancelled");
+  else if (currentFilter !== "All") list = list.filter(b => b.status === currentFilter);
+
+  if (q) list = list.filter(b =>
+    (b.clientName||"").toLowerCase().includes(q) ||
+    (b.phone||"").includes(q) ||
+    (b.eventType||"").toLowerCase().includes(q) ||
+    (b.hall||"").toLowerCase().includes(q)
+  );
+
+  const el = document.getElementById("bookingList");
+  el.innerHTML = list.length
+    ? list.map(b => bookingItemHTML(b)).join("")
+    : `<div class="empty-state"><i class="ti ti-calendar-search"></i><p>No bookings found</p></div>`;
+}
+
+function bookingItemHTML(b) {
+  const d = b.eventDate ? new Date(b.eventDate+"T00:00:00") : null;
+  const day = d ? d.getDate() : "—";
+  const mon = d ? MONTHS_S[d.getMonth()] : "";
+  const balAmt = bal(b);
+  return `
+    <div class="booking-item" onclick="openDetail('${b.id}')">
+      <div class="bk-date-box"><div class="bk-date-day">${day}</div><div class="bk-date-mon">${mon}</div></div>
+      <div class="bk-info">
+        <div class="bk-name">${esc(b.clientName||"—")}</div>
+        <div class="bk-meta">${esc(b.eventType||"")} · ${esc(b.hall||"")}${b.guestCount?` · ${b.guestCount} guests`:""}</div>
+      </div>
+      <div class="bk-right">
+        <div class="bk-amount">${fmt(b.totalAmount)}</div>
+        <div class="bk-balance" style="color:${balAmt>0?"var(--red)":"var(--green)"};">${balAmt>0?fmt(balAmt)+" due":"Fully paid"}</div>
+      </div>
+    </div>`;
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+  renderList();
+}
+
+// ── Detail ────────────────────────────────────────────────
+function openDetail(id) {
+  const b = bookings.find(x => x.id === id);
+  if (!b) return;
+  detailId = id;
+  const balAmt = bal(b);
+  document.getElementById("detailContent").innerHTML = `
+    <div class="detail-hero">
+      <div class="detail-hero-name">${esc(b.clientName||"—")}</div>
+      <div class="detail-hero-sub">
+        ${statusBadge(b.status)}
+        <span>${esc(b.eventType||"")} · ${fmtDate(b.eventDate)}</span>
+      </div>
+    </div>
+    <div class="pad" style="padding-bottom:32px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="ti ti-info-circle"></i>Event details</div></div>
+        <div style="padding:0 16px;">
+          ${infoRow("Hall", b.hall)}
+          ${infoRow("Phone", b.phone||"—")}
+          ${infoRow("Email", b.email||"—")}
+          ${infoRow("Guests", b.guestCount ? b.guestCount+" guests" : "—")}
+          ${infoRow("AC", b.ac===true||b.ac==="true" ? "Yes" : "No")}
+          ${infoRow("Guest rooms", b.guestRooms||"0")}
+          ${b.notes ? infoRow("Notes", b.notes) : ""}
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="card-header"><div class="card-title"><i class="ti ti-receipt"></i>Payment ledger</div>${payBadge(b)}</div>
+        <div style="padding:12px 16px 14px;">
+          <div class="pay-grid">
+            <div class="pay-cell">
+              <div class="pay-cell-label">Total</div>
+              <div class="pay-cell-val" style="color:var(--gold-dark);">${fmt(b.totalAmount)}</div>
+            </div>
+            <div class="pay-cell">
+              <div class="pay-cell-label">Advance</div>
+              <div class="pay-cell-val" style="color:var(--green);">${fmt(b.advancePaid)}</div>
+            </div>
+            <div class="pay-cell">
+              <div class="pay-cell-label">Balance</div>
+              <div class="pay-cell-val" style="color:${balAmt>0?"var(--red)":"var(--green)"};">${fmt(balAmt)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      ${b.createdAt ? `<div style="font-size:11px;color:var(--text-3);text-align:center;margin-top:8px;">Added ${new Date(b.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</div>` : ""}
+    </div>`;
+  openPage("detailPage");
+}
+
+function infoRow(label, val) {
+  return `<div class="info-row"><div class="info-label">${label}</div><div class="info-val">${esc(String(val))}</div></div>`;
+}
+
+function editCurrentDetail() {
+  const b = bookings.find(x => x.id === detailId);
+  if (b) { closePage("detailPage"); openForm(b); }
+}
+
+function deleteConfirm() {
+  showOverlay(
+    "Delete booking?",
+    `This will permanently remove <strong>${esc(bookings.find(b=>b.id===detailId)?.clientName||"this booking")}</strong>. This cannot be undone.`,
+    [
+      { label:"Cancel", cls:"btn-secondary", fn:"closeOverlay()" },
+      { label:"Delete", cls:"btn-danger",    fn:`doDelete('${detailId}')` }
+    ]
+  );
+}
+
+async function doDelete(id) {
+  closeOverlay();
+  await deleteBooking(id);
+  closePage("detailPage");
+  renderAll();
+  renderCalendar();
+  showToast("Booking deleted", "red");
+}
+
+// ── Form ──────────────────────────────────────────────────
+function openForm(b) {
+  editId = b ? b.id : null;
+  document.getElementById("formTitle").textContent = b ? "Edit booking" : "New booking";
+
+  document.getElementById("f-clientName").value  = b?.clientName || "";
+  document.getElementById("f-phone").value       = b?.phone || "";
+  document.getElementById("f-email").value       = b?.email || "";
+  document.getElementById("f-eventDate").value   = b?.eventDate || "";
+  document.getElementById("f-eventType").value   = b?.eventType || "Wedding";
+  document.getElementById("f-hall").value        = b?.hall || "Main Banquet Hall";
+  document.getElementById("f-guestCount").value  = b?.guestCount || "";
+  document.getElementById("f-guestRooms").value  = b?.guestRooms || "0";
+  document.getElementById("f-totalAmount").value = b?.totalAmount || "";
+  document.getElementById("f-advancePaid").value = b?.advancePaid || "";
+  document.getElementById("f-notes").value       = b?.notes || "";
+
+  formAC = (b?.ac === true || b?.ac === "true" || b?.ac === undefined) ? true : false;
+  setAC(formAC);
+
+  formStatus = b?.status || "Confirmed";
+  document.querySelectorAll("[data-status]").forEach(el => el.classList.toggle("active", el.dataset.status === formStatus));
+
+  calcBalance();
+  openPage("formPage");
+}
+
+function setAC(val) {
+  formAC = val;
+  document.getElementById("ac-yes").classList.toggle("active", val);
+  document.getElementById("ac-no").classList.toggle("active", !val);
+}
+
+function setStatus(s, el) {
+  formStatus = s;
+  document.querySelectorAll("[data-status]").forEach(x => x.classList.remove("active"));
+  el.classList.add("active");
+}
+
+function calcBalance() {
+  const t = Number(document.getElementById("f-totalAmount").value||0);
+  const a = Number(document.getElementById("f-advancePaid").value||0);
+  const b = Math.max(0, t-a);
+  document.getElementById("f-balance").textContent = fmt(b);
+  document.getElementById("f-balance").style.color = b>0 ? "var(--red)" : "var(--text-2)";
+}
+
+async function submitForm() {
+  const name  = document.getElementById("f-clientName").value.trim();
+  const phone = document.getElementById("f-phone").value.trim();
+  const date  = document.getElementById("f-eventDate").value;
+  if (!name)  { showToast("Client name is required", "red"); return; }
+  if (!phone) { showToast("Phone number is required", "red"); return; }
+  if (!date)  { showToast("Event date is required", "red"); return; }
+
+  const obj = {
+    id:          editId || null,
+    clientName:  name,
+    phone,
+    email:       document.getElementById("f-email").value.trim(),
+    eventType:   document.getElementById("f-eventType").value,
+    hall:        document.getElementById("f-hall").value,
+    eventDate:   date,
+    guestCount:  document.getElementById("f-guestCount").value,
+    guestRooms:  Number(document.getElementById("f-guestRooms").value||0),
+    ac:          formAC,
+    totalAmount: Number(document.getElementById("f-totalAmount").value||0),
+    advancePaid: Number(document.getElementById("f-advancePaid").value||0),
+    status:      formStatus,
+    notes:       document.getElementById("f-notes").value.trim(),
+  };
+
+  closePage("formPage");
+  if (editId) { await updateBooking(obj); showToast("Booking updated"); }
+  else        { await createBooking(obj); showToast("Booking added", "green"); }
+  renderAll();
+  renderCalendar();
+}
+
+// ── Calendar ──────────────────────────────────────────────
+function renderCalendar() {
+  const td = today();
+  document.getElementById("calLabel").textContent = `${MONTHS_F[calMonth]} ${calYear}`;
+
+  document.getElementById("calHead").innerHTML = DAYS.map(d =>
+    `<span style="text-align:center;font-size:10px;font-weight:500;color:var(--text-3);padding:4px 0;display:block;">${d}</span>`
+  ).join("");
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const days     = new Date(calYear, calMonth+1, 0).getDate();
+
+  // Map of day → bookings
+  const dayMap = {};
+  bookings.forEach(b => {
+    if (!b.eventDate) return;
+    const [y,m,d] = b.eventDate.split("-").map(Number);
+    if (y===calYear && m-1===calMonth) {
+      if (!dayMap[d]) dayMap[d] = [];
+      dayMap[d].push(b);
+    }
+  });
+
+  let html = Array(firstDay).fill(`<div class="cal-cell empty"></div>`).join("");
+  for (let d=1; d<=days; d++) {
+    const ds  = `${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const bks = dayMap[d] || [];
+    const isTd  = ds === td;
+    const isSel = calDay === d;
+    const hasCancelled = bks.some(b=>b.status==="Cancelled");
+    const hasActive    = bks.some(b=>b.status!=="Cancelled");
+    html += `<div class="cal-cell${isTd?" today":""}${isSel?" selected":""}" onclick="calClick(${d})">
+      <div class="cal-cell-day">${d}</div>
+      ${hasActive ? `<div class="cal-dot"></div>` : ""}
+      ${hasCancelled && !hasActive ? `<div class="cal-dot red"></div>` : ""}
+    </div>`;
+  }
+  document.getElementById("calGrid").innerHTML = html;
+
+  // Day list
+  const dayListEl = document.getElementById("calDayList");
+  if (calDay && dayMap[calDay]) {
+    const bks = dayMap[calDay];
+    dayListEl.innerHTML = `
+      <div class="cal-day-title">${calDay} ${MONTHS_F[calMonth]} — ${bks.length} booking${bks.length>1?"s":""}</div>
+      <div class="card">${bks.map(b => bookingItemHTML(b)).join("")}</div>`;
+  } else { dayListEl.innerHTML = ""; }
+}
+
+function calClick(d) {
+  calDay = calDay === d ? null : d;
+  renderCalendar();
+}
+
+function calNav(dir) {
+  calDay = null;
+  calMonth += dir;
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0;  calYear++; }
+  renderCalendar();
+}
+
+// ── Tab & page navigation ─────────────────────────────────
+function switchTab(tab, el) {
+  ["dashboard","bookings","calendar","settings"].forEach(t => {
+    document.getElementById("tab-"+t).style.display = t===tab ? "" : "none";
+  });
+  document.querySelectorAll(".nav-tab").forEach(x => x.classList.remove("active"));
+  if (el) el.classList.add("active");
+  if (tab === "calendar") renderCalendar();
+}
+
+function setNav(tab) {
+  document.querySelectorAll(".nav-item").forEach(x => x.classList.remove("active"));
+  document.getElementById("nav-"+tab)?.classList.add("active");
+}
+
+function openPage(id) {
+  document.getElementById(id).classList.add("open");
+  document.getElementById("app").style.display = "none";
+}
+
+function closePage(id) {
+  document.getElementById(id).classList.remove("open");
+  document.getElementById("app").style.display = "";
+}
+
+// ── Sync UI ───────────────────────────────────────────────
+function setSyncState(state) {
+  const btn = document.getElementById("syncBtn");
+  btn.className = "sync-btn" + (state===""?"":(" "+state));
+  const icons = { syncing:"ti-refresh", ok:"ti-circle-check", err:"ti-alert-triangle", "":"ti-refresh" };
+  btn.innerHTML = `<i class="ti ${icons[state]||"ti-refresh"}"></i>`;
+}
+
+function updateSyncBadge(ok) {
+  document.getElementById("syncStatusLabel").textContent = ok ? "Connected to Google Sheets" : "Not connected";
+  const badge = document.getElementById("syncStatusBadge");
+  badge.textContent = ok ? "Connected" : "Setup needed";
+  badge.className   = ok ? "config-badge" : "config-badge warn";
+}
+
+function updateQueueLabel() {
+  document.getElementById("queueLabel").textContent = offlineQ.length + " pending operation" + (offlineQ.length===1?"":"s");
+}
+
+function updateOnlineUI() {
+  const dot = document.getElementById("onlineIndicator");
+  const lbl = document.getElementById("onlineLabel");
+  dot.style.color = isOnline ? "var(--green)" : "var(--red)";
+  lbl.textContent = isOnline ? "Online" : "Offline — changes will sync when back online";
+}
+
+// ── Settings ──────────────────────────────────────────────
+async function saveSettings() {
+  cfg.scriptUrl = document.getElementById("scriptUrlInput").value.trim();
+  saveCfg();
+  showToast("Settings saved");
+  if (cfg.scriptUrl) await syncFromSheets();
+}
+
+async function testConnection() {
+  const url = document.getElementById("scriptUrlInput").value.trim();
+  if (!url) { showToast("Paste a Script URL first", "red"); return; }
+  setSyncState("syncing");
+  try {
+    const r = await fetch(url);
+    const d = await r.json();
+    if (Array.isArray(d) || d !== undefined) {
+      setSyncState("ok"); updateSyncBadge(true);
+      showToast("Connection successful! ✓", "green");
+    } else throw new Error("Unexpected response");
+  } catch(e) {
+    setSyncState("err");
+    showToast("Connection failed: " + e.message, "red");
+  }
+}
+
+function clearLocalData() {
+  showOverlay("Clear local data?","This removes all bookings from this device and re-fetches from Google Sheets.",
+    [{label:"Cancel",cls:"btn-secondary",fn:"closeOverlay()"},{label:"Clear & re-fetch",cls:"btn-danger",fn:"doClearLocal()"}]);
+}
+async function doClearLocal() {
+  closeOverlay(); bookings=[]; offlineQ=[]; saveBk(); saveQ();
+  renderAll(); renderCalendar();
+  if (cfg.scriptUrl) await syncFromSheets();
+  else showToast("No script URL configured","red");
+}
+
+function exportCSV() {
+  const cols=["id","clientName","phone","email","eventType","hall","eventDate","guestCount","ac","guestRooms","totalAmount","advancePaid","status","notes","createdAt"];
+  const rows=[cols.join(","),...bookings.map(b=>cols.map(c=>`"${String(b[c]||"").replace(/"/g,'""')}"`).join(","))];
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(rows.join("\n"));
+  a.download="smm-bookings.csv"; a.click();
+}
+
+// ── Overlay ───────────────────────────────────────────────
+function showOverlay(title, body, btns) {
+  document.getElementById("overlayTitle").innerHTML = title;
+  document.getElementById("overlayBody").innerHTML  = body;
+  document.getElementById("overlayBtns").innerHTML  = btns.map(b =>
+    `<button class="btn ${b.cls}" style="flex:1;" onclick="${b.fn}">${b.label}</button>`).join("");
+  document.getElementById("overlay").classList.add("show");
+}
+function closeOverlay(e) {
+  if (!e || e.target.id==="overlay") document.getElementById("overlay").classList.remove("show");
+}
+
+// ── Toast ─────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type="") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className   = "toast" + (type ? " "+type : "") + " show";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2800);
+}
+
+// ── Utils ─────────────────────────────────────────────────
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+</script>
+</body>
+</html>
