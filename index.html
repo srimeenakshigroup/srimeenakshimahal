@@ -28,8 +28,8 @@
 }
 html,body{height:100%;margin:0;padding:0;background:var(--cream);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;overflow:hidden;}
 /* KEY LAYOUT: fixed shell, flex column, nav stays at bottom */
-#app{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--cream);overflow:hidden;}
-.topbar{flex-shrink:0;background:var(--surface);padding:calc(env(safe-area-inset-top,12px) + 6px) 16px 0;border-bottom:1px solid var(--border-2);}
+#app{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:var(--cream);}
+.topbar{position:fixed;top:0;left:0;right:0;max-width:480px;margin:0 auto;background:var(--surface);padding:calc(env(safe-area-inset-top,12px) + 6px) 16px 0;border-bottom:1px solid var(--border-2);z-index:100;}
 .topbar-row{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;}
 .topbar-title{font-family:var(--font-serif);font-size:17px;color:var(--text);display:flex;align-items:center;gap:8px;}
 .topbar-sub{font-size:11px;color:var(--text-3);margin-top:-2px;}
@@ -43,10 +43,10 @@ html,body{height:100%;margin:0;padding:0;background:var(--cream);font-family:var
 .nav-tab{flex-shrink:0;background:none;border:none;padding:7px 14px;font-family:var(--font-sans);font-size:13px;color:var(--text-3);border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;}
 .nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:500;}
 /* SCROLL: fills all space between topbar and bottom-nav */
-.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;}
+.scroll{position:fixed;top:var(--topbar-h,108px);left:0;right:0;bottom:calc(56px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;}
 .pad{padding:16px;}
 /* BOTTOM NAV: natural flex child — always flush at bottom */
-.bottom-nav{flex-shrink:0;display:flex;background:var(--surface);border-top:1px solid var(--border-2);padding-bottom:env(safe-area-inset-bottom,0px);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;display:flex;background:var(--surface);border-top:1px solid var(--border-2);padding-bottom:env(safe-area-inset-bottom,0px);z-index:100;}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 6px;background:none;border:none;cursor:pointer;font-family:var(--font-sans);font-size:10px;color:var(--text-3);gap:2px;position:relative;}
 .nav-item i{font-size:22px;line-height:1;}
 .nav-item.active{color:var(--gold);}
@@ -178,6 +178,9 @@ html,body{height:100%;margin:0;padding:0;background:var(--cream);font-family:var
 @media(min-width:480px){
   body{background:#E8D9C0;}
   #app{left:50%;transform:translateX(-50%);right:auto;width:480px;box-shadow:var(--shadow-lg);}
+  .topbar{left:50%;transform:translateX(-50%);right:auto;width:480px;}
+  .scroll{left:50%;transform:translateX(-50%);right:auto;width:480px;}
+  .bottom-nav{left:50%;transform:translateX(-50%);right:auto;width:480px;}
   .page{left:50%;transform:translateX(-50%);right:auto;width:480px;}
   .fab{right:calc(50% - 240px + 16px);}
   .toast{max-width:440px;}
@@ -1088,16 +1091,20 @@ function showToast(msg, type="") {
 function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 </script>
 <script>
-// iOS PWA height fix
-function _fixH(){
-  var h=window.innerHeight+'px';
-  var a=document.getElementById('app');
-  if(a)a.style.height=h;
-  ['detailPage','formPage'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.height=h;});
+// iOS layout fix — measures topbar height dynamically
+function _fixLayout(){
+  var topbar = document.querySelector('.topbar');
+  var th = topbar ? topbar.offsetHeight : 108;
+  document.documentElement.style.setProperty('--topbar-h', th + 'px');
+  // Fix page overlays
+  ['detailPage','formPage'].forEach(function(id){
+    var e=document.getElementById(id);
+    if(e){ e.style.top='0'; e.style.bottom='0'; }
+  });
 }
-_fixH();
-window.addEventListener('resize',_fixH);
-window.addEventListener('orientationchange',function(){setTimeout(_fixH,200);});
+_fixLayout();
+window.addEventListener('resize', _fixLayout);
+window.addEventListener('orientationchange', function(){ setTimeout(_fixLayout, 200); });
 </script>
 </body>
 </html>
